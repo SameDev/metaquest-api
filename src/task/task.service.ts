@@ -17,11 +17,27 @@ export class TaskService {
     });
   }
 
-  findAll(userId: string) {
-    return this.prisma.task.findMany({
+  async findAll(userId: string) {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const tasks = await this.prisma.task.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      include: {
+        completions: {
+          where: { userId },
+          select: { completedAt: true },
+        },
+      },
     });
+
+    return tasks.map(({ completions, ...rest }) => ({
+      ...rest,
+      completed_today: completions.some((c) => c.completedAt >= startOfDay),
+      month_completions: completions.filter((c) => c.completedAt >= startOfMonth).length,
+    }));
   }
 
   async update(userId: string, taskId: string, dto: UpdateTaskDto) {
