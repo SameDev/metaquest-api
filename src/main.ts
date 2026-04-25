@@ -26,6 +26,6 @@ async function bootstrap() {
   app.useGlobalFilters(new ThrottleExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`MetaQuest API running on port ${process.env.PORT ?? 3000}`);
+  console.log(`DisciplineOS API running on port ${process.env.PORT ?? 3000}`);
 }
 bootstrap();
